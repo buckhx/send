@@ -32,7 +32,8 @@ def execute():
     parser.add_argument('--configure', const=True, nargs='?', help='Reset default configuration')
     parser.add_argument('recipients', metavar='recipients', nargs='*', help='where to send file')
     args = parser.parse_args()
-    conf = json.loads(open(SETTINGS_FILENAME))
+    conf = json.loads(open(SETTINGS_FILENAME).read())
+    conf['internal'] = decrypt(conf['internal'])
     send('TEST MESSAGE', conf)
     print "Sent: "+ ''.join(args.file)
     print "Recipients: "+''.join(args.recipients)
@@ -51,11 +52,11 @@ def encrypt(raw):
     cipher = AES.new(get_key(), AES.MODE_CBC, iv)
     return base64.b64encode( iv + cipher.encrypt( pad(raw) ) )
 
-def decrypt():
+def decrypt(enc):
     enc = base64.b64decode(enc)
     iv = enc[:16]
-    cipher = AES.new(get_key, AES.MODE_CBC, iv )
-    return cipher.decrypt(enc[16:])
+    cipher = AES.new(get_key(), AES.MODE_CBC, iv )
+    return unpad(cipher.decrypt(enc[16:]))
 
 if __name__ == "__main__":
     if '--configure' in sys.argv or not os.path.isfile('settings.json'):
