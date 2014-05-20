@@ -34,9 +34,7 @@ def execute():
     args = parser.parse_args()
     conf = json.loads(open(SETTINGS_FILENAME).read())
     conf['internal'] = decrypt(conf['internal'])
-    send('TEST MESSAGE', conf)
-    print "Sent: "+ ''.join(args.file)
-    print "Recipients: "+''.join(args.recipients)
+    send(, conf)
 
 def flush_settings(conf):
     with open(SETTINGS_FILENAME, 'wt') as settings_file:
