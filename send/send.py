@@ -17,13 +17,14 @@ def configure():
     conf = {}
     print "Creating settings to send from..."
     conf['from'] = raw_input("Address to send from: ")
-    conf['internal'] = encrypt(getpass.getpass())
+    conf['internal'] = getpass.getpass()
     conf['server'] = raw_input("SMTP Server to send from (%s): "%DEFAULT_SMTP_SERVER)
     conf['to'] = raw_input("Default address to send to: ")
     if conf['server'] is '':
         conf['server'] = DEFAULT_SMTP_SERVER
+    send('welcome.txt', conf)
+    conf['internal'] = encrypt(conf['internal'])
     flush_settings(conf)
-    send('TEST MESSAGE', conf)
 
 def execute():
     parser = argparse.ArgumentParser(description='Send something...')
@@ -34,7 +35,7 @@ def execute():
     args = parser.parse_args()
     conf = json.loads(open(SETTINGS_FILENAME).read())
     conf['internal'] = decrypt(conf['internal'])
-    send(, conf)
+    send(args.file[0], conf)
 
 def flush_settings(conf):
     with open(SETTINGS_FILENAME, 'wt') as settings_file:
